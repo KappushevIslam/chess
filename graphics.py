@@ -5,7 +5,7 @@ pg.init()
 RES = WEDTH, HEIGHT = 800, 800
 
 sc = pg.display.set_mode(RES)
-
+pg.display.set_caption('Chess')
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLEDZOLOT = (238, 232, 170)
