@@ -6,6 +6,8 @@ RES = WEDTH, HEIGHT = 800, 800
 
 sc = pg.display.set_mode(RES)
 pg.display.set_caption('Chess')
+icon = pg.image.load('pics/big floppa.jpg')
+pg.display.set_icon(icon)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLEDZOLOT = (238, 232, 170)
