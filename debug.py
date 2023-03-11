@@ -10,7 +10,13 @@ class Square:
         self.figure = figure
 
     def draw_square(self, sc, x, y):
-        pg.draw.rect(sc, self.color, [self.size * x, self.size * y, self.size, self.size])
+        surf = pg.Surface((self.size, self.size))
+        pg.draw.rect(surf, self.color, [0, 0, self.size, self.size])
+        if self.figure is not None:
+            figure_pic = pg.image.load('pics/' + self.figure + '.png')
+            figure_pic = pg.transform.scale(figure_pic, (100, 100))
+            surf.blit(figure_pic, (0, 0))
+        sc.blit(surf, (self.size * y, self.size * x))
 
 
 class Board:
@@ -23,8 +29,6 @@ class Board:
     pg.display.set_caption('Chess')
     icon = pg.image.load('pics/big floppa.jpg')
     pg.display.set_icon(icon)
-    floppa = pg.transform.scale(icon, (800, 800))
-    floppa.set_alpha(100)
     FPS = 15
     board_matrix = [
         [Square(BLEDZOLOT, 'bRook'), Square(OHRA, 'bKnight'), Square(BLEDZOLOT, 'bBishop'), Square(OHRA, 'bQueen'), Square(BLEDZOLOT, 'bKing'), Square(OHRA, 'bBishop'), Square(BLEDZOLOT, 'bKnight'), Square(OHRA, 'bRook')],
@@ -49,6 +53,8 @@ class Board:
         gif_img = Image.open('pics/floppa.gif')
         current_frame = 0
         clock = pg.time.Clock()
+        """pg.mixer.music.load('pics/nigga_song.mp3')
+        pg.mixer.music.play()"""
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
