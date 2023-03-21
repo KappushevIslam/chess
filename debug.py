@@ -53,14 +53,21 @@ class Board:
         gif_img = Image.open('pics/floppa.gif')
         current_frame = 0
         clock = pg.time.Clock()
-        """pg.mixer.music.load('pics/nigga_song.mp3')
-        pg.mixer.music.play()"""
+        pos = ''
+        row = ''
+        column = ''
+        pg.mixer.music.load('pics/nigga_song.mp3')
+        pg.mixer.music.play()
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     pg.quit()
                     quit()
-
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    pos = pg.mouse.get_pos()
+                    column = pos[0] // 100
+                    row = pos[1] // 100
+                    print("Click ", pos, "Grid coordinates: ", row, column)
             for x in range(8):
                 for y in range(8):
                     self.board_matrix[x][y].draw_square(self.sc, x, y)
