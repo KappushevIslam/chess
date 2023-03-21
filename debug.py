@@ -4,6 +4,8 @@ from PIL import Image
 
 class Square:
     size = 100
+    is_clicked = 0
+    GREEN = (135, 217, 128)
 
     def __init__(self, color, figure=None):
         self.color = color
@@ -11,7 +13,10 @@ class Square:
 
     def draw_square(self, sc, x, y):
         surf = pg.Surface((self.size, self.size))
-        pg.draw.rect(surf, self.color, [0, 0, self.size, self.size])
+        if self.is_clicked:
+            pg.draw.rect(surf, self.GREEN, [0, 0, self.size, self.size])
+        else:
+            pg.draw.rect(surf, self.color, [0, 0, self.size, self.size])
         if self.figure is not None:
             figure_pic = pg.image.load('pics/' + self.figure + '.png')
             figure_pic = pg.transform.scale(figure_pic, (100, 100))
@@ -67,6 +72,7 @@ class Board:
                     pos = pg.mouse.get_pos()
                     column = pos[0] // 100
                     row = pos[1] // 100
+                    self.board_matrix[row][column].is_clicked = 1
                     print("Click ", pos, "Grid coordinates: ", row, column)
             for x in range(8):
                 for y in range(8):
