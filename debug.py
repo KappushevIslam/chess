@@ -7,6 +7,7 @@ class Square:
     is_clicked = False
     possible_move = False
     GREEN = (49, 196, 74)
+    RED = (255, 17, 0)
 
     def __init__(self, row, col, back_color, figure='.', color='n'):
         self.figure = figure
@@ -17,6 +18,8 @@ class Square:
         self.col = col
         self.col = int(self.col)
         self.back_color = back_color
+        if figure == 'K':
+            self.move_c = 0
 
     def __str__(self):
         return str(self.figure)
@@ -28,12 +31,15 @@ class Square:
             pg.draw.rect(surf, self.GREEN, [0, 0, self.size, self.size])
         else:
             pg.draw.rect(surf, self.back_color, [0, 0, self.size, self.size])
-        if self.possible_move:
-            pg.draw.circle(surf, self.GREEN, [50, 50], 15)
         if self.figure != '.':
             figure_pic = pg.image.load('pics/' + self.color + convert_dct[self.figure] + '.png')
             figure_pic = pg.transform.scale(figure_pic, (100, 100))
             surf.blit(figure_pic, (0, 0))
+        if self.possible_move:
+            if self.figure != '.':
+                pg.draw.circle(surf, self.RED, [50, 50], 15)
+            else:
+                pg.draw.circle(surf, self.GREEN, [50, 50], 15)
         sc.blit(surf, (self.size * y, self.size * x))
 
     def get_possible_moves(self, board):
@@ -216,6 +222,10 @@ class Square:
                                      (board[self.row][self.col + 1].color == 'b' if is_white else board[self.row][
                                                                                                     self.col + 1].color == 'w')):
                 moves += [(self.row, self.col + 1)]
+            if self.move_c == 0 and board[self.row][self.col+1].figure == '.' and board[self.row][self.col+2].figure \
+                == '.' and self.move_c == 0 and board[self.row][self.col+3].figure == 'R':
+                moves += [(self.row, self.col + 2), '0-0']
+
         if is_white:
             moves = list(map(lambda x: (7 - x[0], 7 - x[1]) if type(x) == tuple else x, moves))
             self.row = 7 - self.row
@@ -233,8 +243,13 @@ class Square:
                 board[x_to+1][y_to] = Square(self.row, self.col, board[x_to+1][y_to].back_color)
             else:
                 board[x_to-1][y_to] = Square(self.row, self.col, board[x_to-1][y_to].back_color)
+        if '0-0' in moves_lst:
+            board[x_to][y_to+1] = Square(x_to, y_to+1, board[x_to][y_to+1].back_color)
+            board[x_to][y_to-1] = Square(x_to, y_to-1, board[x_to][y_to-1].back_color, 'R', board[x_to][y_to].color)
         if (x_to == 7 or x_to == 0) and board[x_to][y_to].figure == 'P':
             board[x_to][y_to] = Square(x_to, y_to, board[x_to][y_to].back_color, 'Q', board[x_to][y_to].color)
+        if board[x_to][y_to].figure == 'k':
+            board[x_to][y_to].move_c += 1
 
 
 class Board:
