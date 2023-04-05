@@ -36,7 +36,6 @@ class Square:
             surf.blit(figure_pic, (0, 0))
         sc.blit(surf, (self.size * y, self.size * x))
 
-
     def get_possible_moves(self, board):
         if board[self.row][self.col].color == 'w':
             is_white = True
@@ -52,6 +51,12 @@ class Square:
         if piece == 'P':
             if self.row != 7 and board[self.row + 1][self.col].figure == '.':
                 moves += [(self.row + 1, self.col)]
+            if self.row == 4 and self.col - 1 > -1:
+                if board[self.row][self.col-1].figure == 'P' and board[self.row][self.col-1].color != board[self.row][self.col].color:
+                    moves += [(self.row+1, self.col-1), 'en pess']
+            if self.row == 4 and self.col + 1 < 8:
+                if board[self.row][self.col+1].figure == 'P' and board[self.row][self.col+1].color != board[self.row][self.col].color:
+                    moves += [(self.row+1, self.col+1), 'en pess']
             if self.row == 1 and board[self.row + 2][self.col].figure == '.':
                 moves += [(self.row + 2, self.col)]
             if self.row + 1 < 8 and self.col + 1 < 8:
@@ -212,16 +217,24 @@ class Square:
                                                                                                     self.col + 1].color == 'w')):
                 moves += [(self.row, self.col + 1)]
         if is_white:
-            moves = list(map(lambda x: (7 - x[0], 7 - x[1]), moves))
+            moves = list(map(lambda x: (7 - x[0], 7 - x[1]) if type(x) == tuple else x, moves))
             self.row = 7 - self.row
             self.col = 7 - self.col
         return moves
 
     def make_move(self, x_to, y_to, board):
-        print(board[self.row][self.col].get_possible_moves(board), (x_to, y_to))
-        if (x_to, y_to) in board[self.row][self.col].get_possible_moves(board):
+        moves_lst = board[self.row][self.col].get_possible_moves(board)
+        print(moves_lst, (x_to, y_to))
+        if (x_to, y_to) in moves_lst:
             board[x_to][y_to] = Square(x_to, y_to, board[x_to][y_to].back_color, board[self.row][self.col].figure, board[self.row][self.col].color)
             board[self.row][self.col] = Square(self.row, self.col, board[self.row][self.col].back_color)
+        if 'en pess' in moves_lst:
+            if board[x_to][y_to].color == 'w':
+                board[x_to+1][y_to] = Square(self.row, self.col, board[x_to+1][y_to].back_color)
+            else:
+                board[x_to-1][y_to] = Square(self.row, self.col, board[x_to-1][y_to].back_color)
+        if (x_to == 7 or x_to == 0) and board[x_to][y_to].figure == 'P':
+            board[x_to][y_to] = Square(x_to, y_to, board[x_to][y_to].back_color, 'Q', board[x_to][y_to].color)
 
 
 class Board:
@@ -267,6 +280,7 @@ class Board:
         gif_img = Image.open('pics/floppa.gif')
         current_frame = 0
         clock = pg.time.Clock()
+        move_counter = 0
         while True:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -279,6 +293,7 @@ class Board:
                     available_moves = self.board[row][column].get_possible_moves(self.board)
                     if self.board[row][column].possible_move:
                         self.board[self.last_piece_coords[0]][self.last_piece_coords[1]].make_move(row, column, self.board)
+                        move_counter += 1
                         self.last_piece_coords = []
                         self.board[row][column].is_clicked = False
                         for r in range(8):
@@ -294,11 +309,22 @@ class Board:
                             else:
                                 self.board[r][c].possible_move = False
                     if self.board[row][column].figure != '.':
+                        if move_counter % 2 == 0 and self.board[row][column].color != 'w':
+                            available_moves = []
+                            for r in range(8):
+                                for c in range(8):
+                                    self.board[r][c].possible_move = False
+                            continue
+                        elif move_counter % 2 == 1 and self.board[row][column].color != 'b':
+                            available_moves = []
+                            for r in range(8):
+                                for c in range(8):
+                                    self.board[r][c].possible_move = False
+                            continue
                         self.board[row][column].is_clicked = True
                         self.last_piece_coords = [row, column]
                     else:
                         self.last_piece_coords = []
-
                     print("Click ", pos, "Grid coordinates: ", row, column)
             for x in range(8):
                 for y in range(8):
@@ -311,7 +337,6 @@ class Board:
             pg.display.flip()
             pg.display.update()
             clock.tick(self.FPS)
-
 
 
 board = Board()
